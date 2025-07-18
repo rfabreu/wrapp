@@ -446,3 +446,5 @@ yarn-error.log*
 *.swp
 *.swo
 
+# Hidden keys
+/assets/js/config.js
