@@ -1,14 +1,19 @@
+# .github/workflows/deploy.yml
 name: Deploy to GitHub Pages
+
+# Trigger on pushes to main
 on:
   push:
     branches:
       - main
 
+# Set action permission to push to gh-pages
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write      # Permission needed to push gh-pages branch
 
     steps:
       - name: Checkout code
@@ -16,14 +21,16 @@ jobs:
 
       - name: Inject OWM_API_KEY
         run: |
+          # ensure the folder exists
           mkdir -p assets/js
+          # write your secret into config.js
           echo "window.OWM_API_KEY='${{ secrets.OWM_API_KEY }}';" \
             > assets/js/config.js
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          # swap out the GitHub Token for secret:
+          # Auth
           personal_token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
-          publish_branch: gh-pages   # where to push
-          publish_dir: .             # what to publish
+          publish_branch: gh-pages    # where to push the site
+          publish_dir: .              # publish your repo root
