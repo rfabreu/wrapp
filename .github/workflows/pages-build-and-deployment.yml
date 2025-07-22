@@ -1,47 +1,52 @@
 # .github/workflows/pages-build-and-deployment.yml
 name: GitHub Pages build and deployment
 
-# Fires on every push to main
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
-# Give this workflow the rights to read the repo and deploy Pages
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: read    # for checkout
+  pages: write      # to deploy
+  id-token: write   # for OIDC if ever needed
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
-      # 1) Check out your code
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # 2) Inject your OWM_API_KEY into assets/js/config.js
       - name: Inject OWM_API_KEY
         run: |
           mkdir -p assets/js
           echo "window.OWM_API_KEY='${{ secrets.OWM_API_KEY }}';" \
             > assets/js/config.js
 
-      # 3) (Optional) build step if you ever add one
+      # (Optional) build step
       # - name: Build site
       #   run: npm run build
 
-      # 4) Upload *everything* (including assets/js/config.js) as the Pages artifact
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .        # or ./public, ./docs, etc.
+          path: .      # or ./public, ./docs, etc.
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+
+    # ← Sets env
+    environment:
+      name: github-pages
+
+    permissions:
+      pages: write
+
     steps:
-      # 5) Deploy the artifact to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
