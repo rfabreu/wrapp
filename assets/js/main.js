@@ -71,30 +71,55 @@ async function loadWeatherData() {
   }
 
   try {
-    // Current weather
+    console.log('Loading weather data...');
+    
+    // Current weather - USING HTTPS
     const currentResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${MARKHAM_COORDS[0]}&lon=${MARKHAM_COORDS[1]}&appid=${OWM_API_KEY}&units=metric`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${MARKHAM_COORDS[0]}&lon=${MARKHAM_COORDS[1]}&appid=${OWM_API_KEY}&units=metric`,
+      {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        }
+      }
     );
     
+    console.log('Current weather response status:', currentResponse.status);
+    
     if (!currentResponse.ok) {
-      throw new Error(`Weather API error: ${currentResponse.status}`);
+      const errorText = await currentResponse.text();
+      console.error('Current weather API error response:', errorText);
+      throw new Error(`Weather API error: ${currentResponse.status} - ${errorText}`);
     }
     
     const currentData = await currentResponse.json();
+    console.log('Current weather data:', currentData);
 
     // Update current weather display
     updateCurrentWeather(currentData);
 
-    // 5-day forecast
+    // 5-day forecast - USING HTTPS
     const forecastResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?lat=${MARKHAM_COORDS[0]}&lon=${MARKHAM_COORDS[1]}&appid=${OWM_API_KEY}&units=metric`
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${MARKHAM_COORDS[0]}&lon=${MARKHAM_COORDS[1]}&appid=${OWM_API_KEY}&units=metric`,
+      {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        }
+      }
     );
     
+    console.log('Forecast response status:', forecastResponse.status);
+    
     if (!forecastResponse.ok) {
-      throw new Error(`Forecast API error: ${forecastResponse.status}`);
+      const errorText = await forecastResponse.text();
+      console.error('Forecast API error response:', errorText);
+      throw new Error(`Forecast API error: ${forecastResponse.status} - ${errorText}`);
     }
     
     const forecastData = await forecastResponse.json();
+    console.log('Forecast data:', forecastData);
+    
     updateForecast(forecastData);
 
     console.log('Weather data updated successfully');
@@ -105,6 +130,7 @@ async function loadWeatherData() {
 }
 
 function updateCurrentWeather(data) {
+  console.log('Updating current weather display:', data);
   document.getElementById('temperature').textContent = `${Math.round(data.main.temp)}°C`;
   document.getElementById('humidity').textContent = `${data.main.humidity}%`;
   document.getElementById('windSpeed').textContent = `${Math.round(data.wind.speed * 3.6)} km/h`;
@@ -112,6 +138,8 @@ function updateCurrentWeather(data) {
 }
 
 function updateForecast(data) {
+  console.log('Updating forecast display:', data);
+  
   // Process forecast data (daily highs/lows)
   const dailyData = {};
   
@@ -149,6 +177,7 @@ function updateForecast(data) {
 }
 
 function displayWeatherError() {
+  console.log('Displaying weather error state');
   document.getElementById('temperature').textContent = 'Error';
   document.getElementById('humidity').textContent = 'Error';
   document.getElementById('windSpeed').textContent = 'Error';
@@ -205,7 +234,7 @@ function addWeatherLayers() {
   }
 
   try {
-    // Clouds layer
+    // Clouds layer - USING HTTPS
     cloudsLayer = L.tileLayer(
       `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
@@ -215,7 +244,7 @@ function addWeatherLayers() {
     );
     cloudsLayer.addTo(map);
 
-    // Wind layer
+    // Wind layer - USING HTTPS
     windLayer = L.tileLayer(
       `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
@@ -253,6 +282,7 @@ function refreshAllLayers() {
 // —— INITIALIZATION ——
 async function initialize() {
   console.log('Initializing weather radar app...');
+  console.log('API Key present:', !!OWM_API_KEY);
   
   try {
     // Load initial data
