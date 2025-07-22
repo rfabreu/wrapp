@@ -9,29 +9,17 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # (Optional) If Node is needed to build app:
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build site
-        run: npm run build
-
-      # Inject the secret into a JS config file
       - name: Create config.js
         run: |
           mkdir -p assets/js
+          # wrap your key in quotes so JS sees it as a string
           echo "window.OWM_API_KEY = '${{ secrets.OWM_API_KEY }}';" > assets/js/config.js
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public 
+          publish_dir: .   # deploy from root
