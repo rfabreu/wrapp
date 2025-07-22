@@ -1,96 +1,299 @@
-// —— CONFIG ——
 const OWM_API_KEY = window.OWM_API_KEY;
 if (!OWM_API_KEY) {
   console.error('Missing OpenWeatherMap API key – create assets/js/config.js with window.OWM_API_KEY');
 }
 
-
-const MARKHAM_COORDS        = [43.8561, -79.3370];
+const MARKHAM_COORDS = [43.8561, -79.3370];
 const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
-console.log('main.js loaded');
+console.log('Weather Radar App - main.js loaded');
 
 // —— INITIALIZE MAP ——
 const map = L.map('map', {
   center: MARKHAM_COORDS,
-  zoom: 11,
-  zoomControl: false
+  zoom: 10,
+  zoomControl: true,
+  preferCanvas: true
 });
 
-// Dark base‐map
-L.tileLayer(
-  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-  { attribution: '&copy; CartoDB; &copy; OpenStreetMap', maxZoom: 19 }
-).addTo(map);
+// Add zoom control
+map.zoomControl.setPosition('topleft');
 
-// —— LIVE CLOUDS & WIND LAYERS —— 
-const cloudsLayer = L.tileLayer(
-  `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
-  { opacity: 0.45, zIndex: 100 }
-).addTo(map);
+// Dark base map - using CartoDB Dark Matter-
+const baseLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+  maxZoom: 19,
+  subdomains: 'abcd'
+});
+baseLayer.addTo(map);
 
-const windLayer = L.tileLayer(
-  `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
-  { opacity: 0.6, zIndex: 150 }
-).addTo(map);
-
-// Refresh cloud & wind every 5 minutes to bypass tile caching
-setInterval(() => {
-  cloudsLayer.redraw();
-  windLayer.redraw();
-}, AUTO_REFRESH_INTERVAL);
-
-// —— PERSISTENT NEUTRAL RINGS —— 
-[5, 10, 20, 40, 80].forEach(km => {
-  L.circle(MARKHAM_COORDS, {
-    radius: km * 1000,
-    color: '#888',
-    weight: 2,
-    fill: false
-  }).addTo(map);
+// —— DISTANCE RINGS & MARKERS ——
+const ringDistances = [10, 25, 50, 75, 100]; // km
+ringDistances.forEach(distance => {
+  const ring = L.circle(MARKHAM_COORDS, {
+    radius: distance * 1000, // Convert to meters
+    className: 'distance-ring',
+    interactive: false
+  });
+  ring.addTo(map);
 });
 
-// —— COMPACT LEGEND —— 
-const legend = L.control({ position: 'bottomleft' });
-legend.onAdd = () => {
-  const div = L.DomUtil.create('div', 'legend');
-  div.innerHTML = `
-    <h4>Radius (km)</h4>
-    <div><span class="swatch"></span>5</div>
-    <div><span class="swatch"></span>10</div>
-    <div><span class="swatch"></span>20</div>
-    <div><span class="swatch"></span>40</div>
-    <div><span class="swatch"></span>80</div>
-  `;
-  return div;
-};
-legend.addTo(map);
+// Add center marker for Markham
+const centerMarker = L.circleMarker(MARKHAM_COORDS, {
+  radius: 6,
+  fillColor: '#10b981',
+  color: '#ffffff',
+  weight: 2,
+  opacity: 1,
+  fillOpacity: 1
+});
+centerMarker.addTo(map);
 
-// —— RAINVIEWER RADAR LAYER —— 
-let radarLayer = null;
-async function loadRadar() {
-  console.log('↻ loadRadar()');
+// —— WEATHER LAYERS ——
+let precipitationLayer = null;
+let cloudsLayer = null;
+let windLayer = null;
+
+// —— UTILITY FUNCTIONS ——
+function showLoader() {
   document.getElementById('loader').style.display = 'block';
+}
+
+function hideLoader() {
+  document.getElementById('loader').style.display = 'none';
+}
+
+// —— WEATHER DATA FUNCTIONS ——
+async function loadWeatherData() {
+  if (!OWM_API_KEY) {
+    console.warn('OpenWeatherMap API key not configured');
+    return;
+  }
+
   try {
-    const res  = await fetch('https://api.rainviewer.com/public/weather-maps.json');
-    const json = await res.json();
-    const latest = json.radar[ json.radar.length - 1 ].time;
-    const url = `https://tilecache.rainviewer.com/v2/radar/${latest}/{z}/{x}/{y}/2/1_1.png`;
+    // Current weather
+    const currentResponse = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${MARKHAM_COORDS[0]}&lon=${MARKHAM_COORDS[1]}&appid=${OWM_API_KEY}&units=metric`
+    );
+    
+    if (!currentResponse.ok) {
+      throw new Error(`Weather API error: ${currentResponse.status}`);
+    }
+    
+    const currentData = await currentResponse.json();
 
-    if (radarLayer) map.removeLayer(radarLayer);
-    radarLayer = L.tileLayer(url, {
-      opacity: 0.7,
-      zIndex: 200
-    }).addTo(map);
+    // Update current weather display
+    updateCurrentWeather(currentData);
 
-    console.log('✔ Radar overlaid');
-  } catch (err) {
-    console.error('✖ Radar load failed', err);
-  } finally {
-    document.getElementById('loader').style.display = 'none';
+    // 5-day forecast
+    const forecastResponse = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${MARKHAM_COORDS[0]}&lon=${MARKHAM_COORDS[1]}&appid=${OWM_API_KEY}&units=metric`
+    );
+    
+    if (!forecastResponse.ok) {
+      throw new Error(`Forecast API error: ${forecastResponse.status}`);
+    }
+    
+    const forecastData = await forecastResponse.json();
+    updateForecast(forecastData);
+
+    console.log('Weather data updated successfully');
+  } catch (error) {
+    console.error('Error loading weather data:', error);
+    displayWeatherError();
   }
 }
 
-// —— AUTO-REFRESH RADAR —— 
-loadRadar();
-setInterval(loadRadar, AUTO_REFRESH_INTERVAL);
+function updateCurrentWeather(data) {
+  document.getElementById('temperature').textContent = `${Math.round(data.main.temp)}°C`;
+  document.getElementById('humidity').textContent = `${data.main.humidity}%`;
+  document.getElementById('windSpeed').textContent = `${Math.round(data.wind.speed * 3.6)} km/h`;
+  document.getElementById('pressure').textContent = `${data.main.pressure} hPa`;
+}
+
+function updateForecast(data) {
+  // Process forecast data (daily highs/lows)
+  const dailyData = {};
+  
+  data.list.forEach(item => {
+    const date = new Date(item.dt * 1000);
+    const dateStr = date.toDateString();
+    
+    if (!dailyData[dateStr]) {
+      dailyData[dateStr] = {
+        temps: [],
+        date: date
+      };
+    }
+    dailyData[dateStr].temps.push(item.main.temp);
+  });
+
+  const forecastHTML = Object.values(dailyData)
+    .slice(0, 5)
+    .map(day => {
+      const high = Math.round(Math.max(...day.temps));
+      const low = Math.round(Math.min(...day.temps));
+      const dayName = day.date.toLocaleDateString('en-US', { weekday: 'short' });
+      
+      return `
+        <div class="forecast-day">
+          <span class="day-name">${dayName}</span>
+          <span class="day-temps">
+            <span class="day-high">${high}°</span> / ${low}°
+          </span>
+        </div>
+      `;
+    }).join('');
+
+  document.getElementById('forecast').innerHTML = forecastHTML;
+}
+
+function displayWeatherError() {
+  document.getElementById('temperature').textContent = 'Error';
+  document.getElementById('humidity').textContent = 'Error';
+  document.getElementById('windSpeed').textContent = 'Error';
+  document.getElementById('pressure').textContent = 'Error';
+  document.getElementById('forecast').innerHTML = '<div style="color: #ef4444; font-size: 12px;">Unable to load forecast</div>';
+}
+
+// —— RADAR FUNCTIONS ——
+async function loadRadar() {
+  console.log('↻ Loading radar data...');
+  showLoader();
+  
+  try {
+    const response = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+    
+    if (!response.ok) {
+      throw new Error(`RainViewer API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data.radar && data.radar.length > 0) {
+      const latest = data.radar[data.radar.length - 1];
+      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${latest.time}/{z}/{x}/{y}/2/1_1.png`;
+      
+      // Remove existing precipitation layer
+      if (precipitationLayer) {
+        map.removeLayer(precipitationLayer);
+      }
+      
+      // Add new precipitation layer
+      precipitationLayer = L.tileLayer(radarUrl, {
+        opacity: 0.6,
+        zIndex: 200
+      });
+      precipitationLayer.addTo(map);
+      
+      console.log('Radar updated successfully');
+    } else {
+      throw new Error('No radar data available');
+    }
+  } catch (error) {
+    console.error('Error loading radar:', error);
+  }
+  
+  hideLoader();
+}
+
+// —— ADDITIONAL WEATHER LAYERS ——
+function addWeatherLayers() {
+  if (!OWM_API_KEY) {
+    console.warn('Skipping OpenWeatherMap layers - API key not configured');
+    return;
+  }
+
+  try {
+    // Clouds layer
+    cloudsLayer = L.tileLayer(
+      `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
+      {
+        opacity: 0.3,
+        zIndex: 100
+      }
+    );
+    cloudsLayer.addTo(map);
+
+    // Wind layer
+    windLayer = L.tileLayer(
+      `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
+      {
+        opacity: 0.4,
+        zIndex: 150
+      }
+    );
+    windLayer.addTo(map);
+
+    console.log('Weather layers added successfully');
+  } catch (error) {
+    console.error('Error adding weather layers:', error);
+  }
+}
+
+// —— AUTO-REFRESH FUNCTIONS ——
+function refreshAllLayers() {
+  console.log('Refreshing all layers...');
+  
+  // Refresh weather data
+  loadWeatherData();
+  
+  // Refresh radar
+  loadRadar();
+  
+  // Refresh tile layers to bypass caching
+  if (cloudsLayer) {
+    cloudsLayer.redraw();
+  }
+  if (windLayer) {
+    windLayer.redraw();
+  }
+}
+
+// —— INITIALIZATION ——
+async function initialize() {
+  console.log('Initializing weather radar app...');
+  
+  try {
+    // Load initial data
+    await Promise.all([
+      loadRadar(),
+      loadWeatherData()
+    ]);
+    
+    // Add weather layers
+    addWeatherLayers();
+    
+    // Set up auto-refresh
+    setInterval(refreshAllLayers, AUTO_REFRESH_INTERVAL);
+    
+    console.log('Weather radar app initialized successfully');
+    console.log(`Auto-refresh enabled: ${AUTO_REFRESH_INTERVAL / 1000 / 60} minutes`);
+  } catch (error) {
+    console.error('Error during initialization:', error);
+  }
+}
+
+// —— EVENT HANDLERS ——
+// Handle map resize
+window.addEventListener('resize', () => {
+  map.invalidateSize();
+});
+
+// Handle errors
+window.addEventListener('error', (e) => {
+  console.error('Global error:', e.error);
+});
+
+// Handle unhandled promise rejections
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('Unhandled promise rejection:', e.reason);
+});
+
+// —— START THE APP ——
+// Wait for DOM to be fully loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initialize);
+} else {
+  initialize();
+}
