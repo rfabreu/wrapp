@@ -21,32 +21,70 @@ const map = L.map('map', {
 // Add zoom control
 map.zoomControl.setPosition('topleft');
 
-// Natural color base map - using OpenStreetMap with natural colors
-const baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+// Natural satellite-like base map similar to the screenshot
+const baseLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics',
   maxZoom: 19
 });
 baseLayer.addTo(map);
 
+// Add a subtle overlay for better contrast
+const overlayLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+  attribution: '',
+  opacity: 0.3,
+  maxZoom: 19,
+  subdomains: 'abcd'
+});
+overlayLayer.addTo(map);
+
 // —— DISTANCE RINGS & MARKERS ——
-const ringDistances = [10, 25, 50, 75, 100]; // km
+const ringDistances = [25, 50, 75, 100, 150]; // km
+const distanceRings = [];
+const distanceLabels = [];
+
 ringDistances.forEach(distance => {
+  // Create the ring
   const ring = L.circle(MARKHAM_COORDS, {
     radius: distance * 1000, // Convert to meters
     className: 'distance-ring',
     interactive: false
   });
   ring.addTo(map);
+  distanceRings.push(ring);
+
+  // Calculate positions for labels (at 4 cardinal directions)
+  const positions = [
+    { lat: MARKHAM_COORDS[0] + (distance / 111), lng: MARKHAM_COORDS[1], anchor: 'bottom' }, // North
+    { lat: MARKHAM_COORDS[0] - (distance / 111), lng: MARKHAM_COORDS[1], anchor: 'top' },    // South
+    { lat: MARKHAM_COORDS[0], lng: MARKHAM_COORDS[1] + (distance / (111 * Math.cos(MARKHAM_COORDS[0] * Math.PI / 180))), anchor: 'left' }, // East
+    { lat: MARKHAM_COORDS[0], lng: MARKHAM_COORDS[1] - (distance / (111 * Math.cos(MARKHAM_COORDS[0] * Math.PI / 180))), anchor: 'right' }  // West
+  ];
+
+  positions.forEach(pos => {
+    const label = L.marker([pos.lat, pos.lng], {
+      icon: L.divIcon({
+        className: 'distance-label',
+        html: `${distance}km`,
+        iconSize: [40, 20],
+        iconAnchor: pos.anchor === 'bottom' ? [20, 25] :
+                   pos.anchor === 'top' ? [20, -5] :
+                   pos.anchor === 'left' ? [-5, 10] : [45, 10]
+      }),
+      interactive: false
+    });
+    label.addTo(map);
+    distanceLabels.push(label);
+  });
 });
 
 // Add center marker for Markham
 const centerMarker = L.circleMarker(MARKHAM_COORDS, {
-  radius: 6,
+  radius: 8,
   fillColor: '#10b981',
   color: '#ffffff',
-  weight: 2,
+  weight: 3,
   opacity: 1,
-  fillOpacity: 1
+  fillOpacity: 0.9
 });
 centerMarker.addTo(map);
 
@@ -207,95 +245,32 @@ async function loadRadar() {
     }
     
     const data = await response.json();
-    console.log('RainViewer API response:', data);
     
-    // Check multiple possible data structures
-    let radarData = null;
-    if (data.radar && Array.isArray(data.radar) && data.radar.length > 0) {
-      radarData = data.radar;
-    } else if (data.weather && data.weather.radar && Array.isArray(data.weather.radar)) {
-      radarData = data.weather.radar;
-    } else if (data.generated && data.past && Array.isArray(data.past)) {
-      radarData = data.past;
-    }
-    
-    if (radarData && radarData.length > 0) {
-      const latest = radarData[radarData.length - 1];
-      console.log('Latest radar frame:', latest);
-      
-      // Handle different timestamp formats
-      let timestamp = latest.time || latest.timestamp || latest.path;
-      if (typeof timestamp !== 'string') {
-        timestamp = timestamp.toString();
-      }
-      
-      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${timestamp}/{z}/{x}/{y}/2/1_1.png`;
-      console.log('Radar URL:', radarUrl);
+    if (data.radar && data.radar.length > 0) {
+      const latest = data.radar[data.radar.length - 1];
+      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${latest.time}/{z}/{x}/{y}/2/1_1.png`;
       
       // Remove existing precipitation layer
       if (precipitationLayer) {
         map.removeLayer(precipitationLayer);
       }
       
-      // Add new precipitation layer with higher opacity for better visibility
+      // Add new precipitation layer
       precipitationLayer = L.tileLayer(radarUrl, {
         opacity: 0.7,
-        zIndex: 200,
-        errorTileUrl: '', // Prevent broken tile indicators
-        detectRetina: false
+        zIndex: 200
       });
-      
-      precipitationLayer.on('tileerror', function(error) {
-        console.warn('Radar tile error:', error);
-      });
-      
       precipitationLayer.addTo(map);
       
-      console.log('Radar layer added successfully');
+      console.log('Radar updated successfully');
     } else {
-      console.warn('No radar data found in response structure');
-      console.log('Full API response structure:', JSON.stringify(data, null, 2));
-      throw new Error('No radar data available in API response');
+      throw new Error('No radar data available');
     }
   } catch (error) {
     console.error('Error loading radar:', error);
-    
-    // Try alternative radar source as fallback
-    try {
-      console.log('Trying alternative radar source...');
-      await loadAlternativeRadar();
-    } catch (fallbackError) {
-      console.error('Fallback radar also failed:', fallbackError);
-    }
   }
   
   hideLoader();
-}
-
-// Alternative radar source as fallback
-async function loadAlternativeRadar() {
-  // Try OpenWeatherMap precipitation layer if available
-  if (OWM_API_KEY) {
-    console.log('Loading OpenWeatherMap precipitation layer...');
-    
-    // Remove existing precipitation layer
-    if (precipitationLayer) {
-      map.removeLayer(precipitationLayer);
-    }
-    
-    // Add OpenWeatherMap precipitation layer
-    precipitationLayer = L.tileLayer(
-      `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
-      {
-        opacity: 0.6,
-        zIndex: 200
-      }
-    );
-    precipitationLayer.addTo(map);
-    console.log('OpenWeatherMap precipitation layer loaded as fallback');
-  } else {
-    throw new Error('No alternative radar source available');
-  }
 }
 
 // —— ADDITIONAL WEATHER LAYERS ——
@@ -306,25 +281,15 @@ function addWeatherLayers() {
   }
 
   try {
-    // Clouds layer with reduced opacity for natural look
+    // Clouds layer
     cloudsLayer = L.tileLayer(
       `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
-        opacity: 0.2,
+        opacity: 0.25,
         zIndex: 100
       }
     );
     cloudsLayer.addTo(map);
-
-    // Wind layer with reduced opacity
-    windLayer = L.tileLayer(
-      `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
-      {
-        opacity: 0.3,
-        zIndex: 150
-      }
-    );
-    windLayer.addTo(map);
 
     console.log('Weather layers added successfully');
   } catch (error) {
@@ -346,9 +311,24 @@ function refreshAllLayers() {
   if (cloudsLayer) {
     cloudsLayer.redraw();
   }
-  if (windLayer) {
-    windLayer.redraw();
-  }
+}
+
+// —— VISIBILITY CONTROLS ——
+function updateRingVisibility() {
+  const currentZoom = map.getZoom();
+  const minZoomForLabels = 9;
+  
+  distanceLabels.forEach(label => {
+    if (currentZoom >= minZoomForLabels) {
+      if (!map.hasLayer(label)) {
+        map.addLayer(label);
+      }
+    } else {
+      if (map.hasLayer(label)) {
+        map.removeLayer(label);
+      }
+    }
+  });
 }
 
 // —— INITIALIZATION ——
@@ -357,6 +337,10 @@ async function initialize() {
   console.log('Environment: GitHub Pages deployment with secure API key injection');
   
   try {
+    // Set up zoom event listener for label visibility
+    map.on('zoomend', updateRingVisibility);
+    updateRingVisibility(); // Initial check
+    
     // Load initial data
     await Promise.all([
       loadRadar(),

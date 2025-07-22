@@ -8,50 +8,39 @@ html, body {
   width: 100%;
   height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0f1419;
+  background: #0a0f14;
   overflow: hidden;
 }
 
 #map {
   width: 100%;
   height: 100vh;
-  background: #0f1419;
+  background: #0a0f14;
 }
 
-/* Dark theme for Leaflet controls (keeping UI dark while map is natural) */
+/* Dark theme for Leaflet */
 .leaflet-container {
-  background: #0f1419;
+  background: #0a0f14;
 }
 
 .leaflet-control-zoom {
-  background: rgba(15, 20, 25, 0.95);
-  border: 1px solid #2d3748;
+  background: rgba(10, 15, 20, 0.9);
+  border: 1px solid #1a2332;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .leaflet-control-zoom a {
-  background: rgba(15, 20, 25, 0.95);
-  color: #e2e8f0;
-  border-color: #2d3748;
+  background: rgba(10, 15, 20, 0.9);
+  color: #cbd5e1;
+  border-color: #1a2332;
   font-weight: 600;
   font-size: 16px;
 }
 
 .leaflet-control-zoom a:hover {
-  background: #2d3748;
+  background: #1a2332;
   color: #ffffff;
-}
-
-/* Attribution control styling */
-.leaflet-control-attribution {
-  background: rgba(15, 20, 25, 0.8);
-  color: #94a3b8;
-  font-size: 10px;
-}
-
-.leaflet-control-attribution a {
-  color: #10b981;
 }
 
 /* Loading spinner */
@@ -80,14 +69,14 @@ html, body {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(15, 20, 25, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid #2d3748;
+  background: rgba(10, 15, 20, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid #1a2332;
   border-radius: 12px;
   padding: 20px;
   min-width: 280px;
   z-index: 1000;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
 }
 
 .weather-panel h2 {
@@ -121,8 +110,8 @@ html, body {
 }
 
 .weather-item {
-  background: rgba(45, 55, 72, 0.3);
-  border: 1px solid #2d3748;
+  background: rgba(26, 35, 50, 0.4);
+  border: 1px solid #1a2332;
   border-radius: 8px;
   padding: 12px;
 }
@@ -160,7 +149,7 @@ html, body {
 
 /* Forecast section */
 .forecast-section {
-  border-top: 1px solid #2d3748;
+  border-top: 1px solid #1a2332;
   padding-top: 16px;
 }
 
@@ -178,7 +167,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(45, 55, 72, 0.3);
+  border-bottom: 1px solid rgba(26, 35, 50, 0.3);
 }
 
 .forecast-day:last-child {
@@ -207,13 +196,13 @@ html, body {
   position: absolute;
   bottom: 20px;
   left: 20px;
-  background: rgba(15, 20, 25, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid #2d3748;
+  background: rgba(10, 15, 20, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid #1a2332;
   border-radius: 8px;
   padding: 16px;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 .radar-legend h4 {
@@ -265,12 +254,25 @@ html, body {
   background: #10b981;
 }
 
-/* Distance rings styling - slightly more visible on natural map */
+/* Distance rings styling - lighter and more translucent */
 .distance-ring {
-  stroke: rgba(255, 255, 255, 0.4);
+  stroke: rgba(255, 255, 255, 0.15);
   stroke-width: 1.5;
   fill: none;
-  stroke-dasharray: 5, 5;
+  stroke-dasharray: 5,5;
+}
+
+/* Distance labels */
+.distance-label {
+  background: rgba(10, 15, 20, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  color: #cbd5e1;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 /* Responsive adjustments */
@@ -286,5 +288,10 @@ html, body {
     bottom: 10px;
     left: 10px;
     padding: 12px;
+  }
+  
+  .distance-label {
+    font-size: 10px;
+    padding: 1px 4px;
   }
 }
