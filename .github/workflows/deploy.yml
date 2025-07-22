@@ -1,5 +1,4 @@
 name: Deploy to GitHub Pages
-
 on:
   push:
     branches:
@@ -8,18 +7,23 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write      # Permission needed to push gh-pages branch
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Create config.js
+      - name: Inject OWM_API_KEY
         run: |
           mkdir -p assets/js
-          # wrap your key in quotes so JS sees it as a string
-          echo "window.OWM_API_KEY = '${{ secrets.OWM_API_KEY }}';" > assets/js/config.js
+          echo "window.OWM_API_KEY='${{ secrets.OWM_API_KEY }}';" \
+            > assets/js/config.js
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .   # deploy from root
+          # swap out the GitHub Token for secret:
+          personal_token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
+          publish_branch: gh-pages   # where to push
+          publish_dir: .             # what to publish
