@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weather Radar - Markham</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div id="loader" class="loader"></div>
+  <div id="map"></div>
+  
+  <div class="weather-panel">
+    <h2>
+      <span class="location-dot"></span>
+      Markham, ON
+    </h2>
+    <div class="weather-grid">
+      <div class="weather-item">
+        <h3>Temperature</h3>
+        <div class="weather-value temp-value" id="temperature">--°C</div>
+      </div>
+      <div class="weather-item">
+        <h3>Humidity</h3>
+        <div class="weather-value humidity-value" id="humidity">--%</div>
+      </div>
+      <div class="weather-item">
+        <h3>Wind Speed</h3>
+        <div class="weather-value wind-value" id="windSpeed">-- km/h</div>
+      </div>
+      <div class="weather-item">
+        <h3>Pressure</h3>
+        <div class="weather-value pressure-value" id="pressure">-- hPa</div>
+      </div>
+    </div>
+    
+    <div class="forecast-section">
+      <h3>5-Day Forecast</h3>
+      <div id="forecast"></div>
+    </div>
+    
+    <div class="status-indicator">
+      <div class="status-dot"></div>
+      <span>Live • Updates every 5 min</span>
+    </div>
+  </div>
+
+  <div class="radar-legend">
+    <h4>Precipitation</h4>
+    <div class="legend-item">
+      <div class="legend-color legend-light"></div>
+      Light
+    </div>
+    <div class="legend-item">
+      <div class="legend-color legend-moderate"></div>
+      Moderate
+    </div>
+    <div class="legend-item">
+      <div class="legend-color legend-heavy"></div>
+      Heavy
+    </div>
+    <div class="legend-item">
+      <div class="legend-color legend-severe"></div>
+      Severe
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
