@@ -18,7 +18,7 @@ html, body {
   background: #0f1419;
 }
 
-/* Dark theme for Leaflet */
+/* Dark theme for Leaflet controls (keeping UI dark while map is natural) */
 .leaflet-container {
   background: #0f1419;
 }
@@ -41,6 +41,17 @@ html, body {
 .leaflet-control-zoom a:hover {
   background: #2d3748;
   color: #ffffff;
+}
+
+/* Attribution control styling */
+.leaflet-control-attribution {
+  background: rgba(15, 20, 25, 0.8);
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.leaflet-control-attribution a {
+  color: #10b981;
 }
 
 /* Loading spinner */
@@ -254,11 +265,12 @@ html, body {
   background: #10b981;
 }
 
-/* Distance rings styling */
+/* Distance rings styling - slightly more visible on natural map */
 .distance-ring {
-  stroke: rgba(148, 163, 184, 0.3);
-  stroke-width: 1;
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 1.5;
   fill: none;
+  stroke-dasharray: 5, 5;
 }
 
 /* Responsive adjustments */

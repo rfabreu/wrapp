@@ -1,4 +1,3 @@
-// API key will be injected by GitHub Actions into config.js
 const OWM_API_KEY = window.OWM_API_KEY;
 
 if (!OWM_API_KEY) {
@@ -22,11 +21,10 @@ const map = L.map('map', {
 // Add zoom control
 map.zoomControl.setPosition('topleft');
 
-// Dark base map - using CartoDB Dark Matter
-const baseLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
-  maxZoom: 19,
-  subdomains: 'abcd'
+// Natural color base map - using OpenStreetMap with natural colors
+const baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+  maxZoom: 19
 });
 baseLayer.addTo(map);
 
@@ -209,32 +207,95 @@ async function loadRadar() {
     }
     
     const data = await response.json();
+    console.log('RainViewer API response:', data);
     
-    if (data.radar && data.radar.length > 0) {
-      const latest = data.radar[data.radar.length - 1];
-      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${latest.time}/{z}/{x}/{y}/2/1_1.png`;
+    // Check multiple possible data structures
+    let radarData = null;
+    if (data.radar && Array.isArray(data.radar) && data.radar.length > 0) {
+      radarData = data.radar;
+    } else if (data.weather && data.weather.radar && Array.isArray(data.weather.radar)) {
+      radarData = data.weather.radar;
+    } else if (data.generated && data.past && Array.isArray(data.past)) {
+      radarData = data.past;
+    }
+    
+    if (radarData && radarData.length > 0) {
+      const latest = radarData[radarData.length - 1];
+      console.log('Latest radar frame:', latest);
+      
+      // Handle different timestamp formats
+      let timestamp = latest.time || latest.timestamp || latest.path;
+      if (typeof timestamp !== 'string') {
+        timestamp = timestamp.toString();
+      }
+      
+      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${timestamp}/{z}/{x}/{y}/2/1_1.png`;
+      console.log('Radar URL:', radarUrl);
       
       // Remove existing precipitation layer
       if (precipitationLayer) {
         map.removeLayer(precipitationLayer);
       }
       
-      // Add new precipitation layer
+      // Add new precipitation layer with higher opacity for better visibility
       precipitationLayer = L.tileLayer(radarUrl, {
-        opacity: 0.6,
-        zIndex: 200
+        opacity: 0.7,
+        zIndex: 200,
+        errorTileUrl: '', // Prevent broken tile indicators
+        detectRetina: false
       });
+      
+      precipitationLayer.on('tileerror', function(error) {
+        console.warn('Radar tile error:', error);
+      });
+      
       precipitationLayer.addTo(map);
       
-      console.log('Radar updated successfully');
+      console.log('Radar layer added successfully');
     } else {
-      throw new Error('No radar data available');
+      console.warn('No radar data found in response structure');
+      console.log('Full API response structure:', JSON.stringify(data, null, 2));
+      throw new Error('No radar data available in API response');
     }
   } catch (error) {
     console.error('Error loading radar:', error);
+    
+    // Try alternative radar source as fallback
+    try {
+      console.log('Trying alternative radar source...');
+      await loadAlternativeRadar();
+    } catch (fallbackError) {
+      console.error('Fallback radar also failed:', fallbackError);
+    }
   }
   
   hideLoader();
+}
+
+// Alternative radar source as fallback
+async function loadAlternativeRadar() {
+  // Try OpenWeatherMap precipitation layer if available
+  if (OWM_API_KEY) {
+    console.log('Loading OpenWeatherMap precipitation layer...');
+    
+    // Remove existing precipitation layer
+    if (precipitationLayer) {
+      map.removeLayer(precipitationLayer);
+    }
+    
+    // Add OpenWeatherMap precipitation layer
+    precipitationLayer = L.tileLayer(
+      `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
+      {
+        opacity: 0.6,
+        zIndex: 200
+      }
+    );
+    precipitationLayer.addTo(map);
+    console.log('OpenWeatherMap precipitation layer loaded as fallback');
+  } else {
+    throw new Error('No alternative radar source available');
+  }
 }
 
 // —— ADDITIONAL WEATHER LAYERS ——
@@ -245,21 +306,21 @@ function addWeatherLayers() {
   }
 
   try {
-    // Clouds layer
+    // Clouds layer with reduced opacity for natural look
     cloudsLayer = L.tileLayer(
       `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
-        opacity: 0.3,
+        opacity: 0.2,
         zIndex: 100
       }
     );
     cloudsLayer.addTo(map);
 
-    // Wind layer
+    // Wind layer with reduced opacity
     windLayer = L.tileLayer(
       `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
-        opacity: 0.4,
+        opacity: 0.3,
         zIndex: 150
       }
     );
