@@ -428,6 +428,7 @@ build/
 # Local env
 .env.local
 .env.*.local
+.env
 
 # IDEs
 .vscode/

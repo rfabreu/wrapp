@@ -1,12 +1,15 @@
+// API key will be injected by GitHub Actions into config.js
 const OWM_API_KEY = window.OWM_API_KEY;
+
 if (!OWM_API_KEY) {
-  console.error('Missing OpenWeatherMap API key – create assets/js/config.js with window.OWM_API_KEY');
+  console.error('Missing OpenWeatherMap API key - check GitHub Secrets configuration');
 }
 
 const MARKHAM_COORDS = [43.8561, -79.3370];
 const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 console.log('Weather Radar App - main.js loaded');
+console.log('API Key present:', !!OWM_API_KEY);
 
 // —— INITIALIZE MAP ——
 const map = L.map('map', {
@@ -19,7 +22,7 @@ const map = L.map('map', {
 // Add zoom control
 map.zoomControl.setPosition('topleft');
 
-// Dark base map - using CartoDB Dark Matter-
+// Dark base map - using CartoDB Dark Matter
 const baseLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
   maxZoom: 19,
@@ -67,13 +70,14 @@ function hideLoader() {
 async function loadWeatherData() {
   if (!OWM_API_KEY) {
     console.warn('OpenWeatherMap API key not configured');
+    displayWeatherError('API key not configured');
     return;
   }
 
   try {
     console.log('Loading weather data...');
     
-    // Current weather - USING HTTPS
+    // Current weather
     const currentResponse = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?lat=${MARKHAM_COORDS[0]}&lon=${MARKHAM_COORDS[1]}&appid=${OWM_API_KEY}&units=metric`,
       {
@@ -93,12 +97,12 @@ async function loadWeatherData() {
     }
     
     const currentData = await currentResponse.json();
-    console.log('Current weather data:', currentData);
+    console.log('Current weather data loaded successfully');
 
     // Update current weather display
     updateCurrentWeather(currentData);
 
-    // 5-day forecast - USING HTTPS
+    // 5-day forecast
     const forecastResponse = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?lat=${MARKHAM_COORDS[0]}&lon=${MARKHAM_COORDS[1]}&appid=${OWM_API_KEY}&units=metric`,
       {
@@ -118,71 +122,78 @@ async function loadWeatherData() {
     }
     
     const forecastData = await forecastResponse.json();
-    console.log('Forecast data:', forecastData);
+    console.log('Forecast data loaded successfully');
     
     updateForecast(forecastData);
 
-    console.log('Weather data updated successfully');
+    console.log('All weather data updated successfully');
   } catch (error) {
     console.error('Error loading weather data:', error);
-    displayWeatherError();
+    displayWeatherError(error.message);
   }
 }
 
 function updateCurrentWeather(data) {
-  console.log('Updating current weather display:', data);
-  document.getElementById('temperature').textContent = `${Math.round(data.main.temp)}°C`;
-  document.getElementById('humidity').textContent = `${data.main.humidity}%`;
-  document.getElementById('windSpeed').textContent = `${Math.round(data.wind.speed * 3.6)} km/h`;
-  document.getElementById('pressure').textContent = `${data.main.pressure} hPa`;
+  try {
+    document.getElementById('temperature').textContent = `${Math.round(data.main.temp)}°C`;
+    document.getElementById('humidity').textContent = `${data.main.humidity}%`;
+    document.getElementById('windSpeed').textContent = `${Math.round(data.wind.speed * 3.6)} km/h`;
+    document.getElementById('pressure').textContent = `${data.main.pressure} hPa`;
+    console.log('Current weather display updated');
+  } catch (error) {
+    console.error('Error updating current weather display:', error);
+  }
 }
 
 function updateForecast(data) {
-  console.log('Updating forecast display:', data);
-  
-  // Process forecast data (daily highs/lows)
-  const dailyData = {};
-  
-  data.list.forEach(item => {
-    const date = new Date(item.dt * 1000);
-    const dateStr = date.toDateString();
+  try {
+    // Process forecast data (daily highs/lows)
+    const dailyData = {};
     
-    if (!dailyData[dateStr]) {
-      dailyData[dateStr] = {
-        temps: [],
-        date: date
-      };
-    }
-    dailyData[dateStr].temps.push(item.main.temp);
-  });
-
-  const forecastHTML = Object.values(dailyData)
-    .slice(0, 5)
-    .map(day => {
-      const high = Math.round(Math.max(...day.temps));
-      const low = Math.round(Math.min(...day.temps));
-      const dayName = day.date.toLocaleDateString('en-US', { weekday: 'short' });
+    data.list.forEach(item => {
+      const date = new Date(item.dt * 1000);
+      const dateStr = date.toDateString();
       
-      return `
-        <div class="forecast-day">
-          <span class="day-name">${dayName}</span>
-          <span class="day-temps">
-            <span class="day-high">${high}°</span> / ${low}°
-          </span>
-        </div>
-      `;
-    }).join('');
+      if (!dailyData[dateStr]) {
+        dailyData[dateStr] = {
+          temps: [],
+          date: date
+        };
+      }
+      dailyData[dateStr].temps.push(item.main.temp);
+    });
 
-  document.getElementById('forecast').innerHTML = forecastHTML;
+    const forecastHTML = Object.values(dailyData)
+      .slice(0, 5)
+      .map(day => {
+        const high = Math.round(Math.max(...day.temps));
+        const low = Math.round(Math.min(...day.temps));
+        const dayName = day.date.toLocaleDateString('en-US', { weekday: 'short' });
+        
+        return `
+          <div class="forecast-day">
+            <span class="day-name">${dayName}</span>
+            <span class="day-temps">
+              <span class="day-high">${high}°</span> / ${low}°
+            </span>
+          </div>
+        `;
+      }).join('');
+
+    document.getElementById('forecast').innerHTML = forecastHTML;
+    console.log('Forecast display updated');
+  } catch (error) {
+    console.error('Error updating forecast display:', error);
+  }
 }
 
-function displayWeatherError() {
-  console.log('Displaying weather error state');
+function displayWeatherError(message = 'Unable to load data') {
+  console.log('Displaying weather error state:', message);
   document.getElementById('temperature').textContent = 'Error';
   document.getElementById('humidity').textContent = 'Error';
   document.getElementById('windSpeed').textContent = 'Error';
   document.getElementById('pressure').textContent = 'Error';
-  document.getElementById('forecast').innerHTML = '<div style="color: #ef4444; font-size: 12px;">Unable to load forecast</div>';
+  document.getElementById('forecast').innerHTML = `<div style="color: #ef4444; font-size: 12px;">${message}</div>`;
 }
 
 // —— RADAR FUNCTIONS ——
@@ -234,7 +245,7 @@ function addWeatherLayers() {
   }
 
   try {
-    // Clouds layer - USING HTTPS
+    // Clouds layer
     cloudsLayer = L.tileLayer(
       `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
@@ -244,7 +255,7 @@ function addWeatherLayers() {
     );
     cloudsLayer.addTo(map);
 
-    // Wind layer - USING HTTPS
+    // Wind layer
     windLayer = L.tileLayer(
       `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
@@ -282,7 +293,7 @@ function refreshAllLayers() {
 // —— INITIALIZATION ——
 async function initialize() {
   console.log('Initializing weather radar app...');
-  console.log('API Key present:', !!OWM_API_KEY);
+  console.log('Environment: GitHub Pages deployment with secure API key injection');
   
   try {
     // Load initial data
