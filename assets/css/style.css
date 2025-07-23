@@ -102,6 +102,55 @@ html, body {
   50% { opacity: 0.5; }
 }
 
+/* Center marker ping animation - radar-style ping effect */
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  75% {
+    transform: scale(3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* Center marker container */
+.center-marker-container {
+  position: relative;
+}
+
+/* Center marker dot - stays solid */
+.center-marker-dot {
+  width: 16px;
+  height: 16px;
+  background-color: #10b981;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+/* Ping ring that expands */
+.center-marker-ping {
+  width: 16px;
+  height: 16px;
+  background-color: #10b981;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  z-index: 1;
+}
+
 .weather-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -254,27 +303,6 @@ html, body {
   background: #10b981;
 }
 
-/* Distance rings styling - lighter and more translucent */
-.distance-ring {
-  stroke: rgba(255, 255, 255, 0.15);
-  stroke-width: 1.5;
-  fill: none;
-  stroke-dasharray: 5,5;
-}
-
-/* Distance labels */
-.distance-label {
-  background: rgba(10, 15, 20, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 11px;
-  color: #cbd5e1;
-  font-weight: 500;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .weather-panel {
@@ -288,10 +316,5 @@ html, body {
     bottom: 10px;
     left: 10px;
     padding: 12px;
-  }
-  
-  .distance-label {
-    font-size: 10px;
-    padding: 1px 4px;
   }
 }
