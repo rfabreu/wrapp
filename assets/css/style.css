@@ -64,20 +64,20 @@ html, body {
   100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Weather info panel */
+/* Weather info panel - increased transparency */
 .weather-panel {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(10, 15, 20, 0.85);
+  background: rgba(10, 15, 20, 0.74); /* More transparent */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* More transparent border */
   border-radius: 12px;
   padding: 20px;
   min-width: 280px;
   z-index: 1000;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); /* Lighter shadow */
 }
 
 .weather-panel h2 {
@@ -161,8 +161,8 @@ html, body {
 }
 
 .weather-item {
-  background: rgba(26, 35, 50, 0.4);
-  border: 1px solid #1a2332;
+  background: rgba(26, 35, 50, 0.3); /* More transparent */
+  border: 1px solid rgba(26, 35, 50, 0.4); /* More transparent border */
   border-radius: 8px;
   padding: 12px;
 }
@@ -198,19 +198,47 @@ html, body {
   color: #10b981;
 }
 
-/* Forecast section */
+/* Forecast section - collapsible */
 .forecast-section {
-  border-top: 1px solid #1a2332;
+  border-top: 1px solid rgba(26, 35, 50, 0.4); /* More transparent border */
   padding-top: 16px;
 }
 
-.forecast-section h3 {
+.forecast-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-bottom: 12px;
+  user-select: none;
+}
+
+.forecast-header h3 {
   color: #94a3b8;
   font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 12px;
+  margin: 0;
+}
+
+.forecast-toggle {
+  color: #94a3b8;
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.forecast-toggle.collapsed {
+  transform: rotate(-90deg);
+}
+
+.forecast-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.forecast-content.collapsed {
+  max-height: 0;
 }
 
 .forecast-day {
@@ -218,7 +246,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(26, 35, 50, 0.3);
+  border-bottom: 1px solid rgba(26, 35, 50, 0.2); /* More transparent */
 }
 
 .forecast-day:last-child {
@@ -242,19 +270,19 @@ html, body {
   font-weight: 600;
 }
 
-/* Legend */
+/* Legend - increased transparency */
 .radar-legend {
   position: absolute;
   bottom: 20px;
   left: 20px;
-  background: rgba(10, 15, 20, 0.85);
+  background: rgba(10, 15, 20, 0.6); /* More transparent */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* More transparent border */
   border-radius: 8px;
   padding: 16px;
   z-index: 1000;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3); /* Lighter shadow */
 }
 
 .radar-legend h4 {
@@ -311,19 +339,20 @@ html, body {
   .weather-panel {
     right: 10px;
     top: 10px;
-    left: 10px;
-    min-width: auto;
-    max-width: calc(100vw - 20px);
-    padding: 16px;
+    left: auto;
+    min-width: 260px;
+    max-width: 280px;
+    padding: 14px;
   }
   
   .weather-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
+    margin-bottom: 16px;
   }
   
   .weather-item {
-    padding: 10px;
+    padding: 8px;
   }
   
   .weather-value {
@@ -333,9 +362,9 @@ html, body {
   .radar-legend {
     bottom: 10px;
     left: 10px;
-    right: 10px;
+    right: auto;
     padding: 12px;
-    max-width: calc(100vw - 20px);
+    max-width: 200px;
   }
   
   .legend-item {
@@ -354,99 +383,143 @@ html, body {
   .weather-panel {
     position: fixed;
     top: 10px;
-    left: 10px;
     right: 10px;
-    min-width: auto;
-    padding: 14px;
+    left: auto;
+    min-width: 240px;
+    max-width: 260px;
+    padding: 12px;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
   }
   
   .weather-panel h2 {
-    font-size: 16px;
-    margin-bottom: 12px;
+    font-size: 15px;
+    margin-bottom: 10px;
   }
   
   .weather-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 12px;
   }
   
   .weather-item {
-    padding: 8px;
+    padding: 6px;
   }
   
   .weather-item h3 {
-    font-size: 10px;
-    margin-bottom: 3px;
+    font-size: 9px;
+    margin-bottom: 2px;
   }
   
   .weather-value {
-    font-size: 13px;
+    font-size: 12px;
   }
   
-  .forecast-section h3 {
+  .forecast-section {
+    padding-top: 12px;
+  }
+  
+  .forecast-header h3 {
+    font-size: 9px;
+  }
+  
+  .forecast-toggle {
     font-size: 10px;
-    margin-bottom: 10px;
   }
   
   .forecast-day {
-    padding: 6px 0;
+    padding: 4px 0;
   }
   
   .day-name {
-    font-size: 12px;
-    min-width: 50px;
+    font-size: 11px;
+    min-width: 40px;
   }
   
   .day-temps {
-    font-size: 12px;
+    font-size: 11px;
   }
   
   .status-indicator {
-    font-size: 10px;
-    margin-top: 6px;
+    font-size: 9px;
+    margin-top: 4px;
   }
   
   .radar-legend {
     position: fixed;
     bottom: 10px;
     left: 10px;
-    right: 10px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    right: auto;
+    padding: 8px;
+    max-width: 160px;
   }
   
   .radar-legend h4 {
-    font-size: 12px;
-    margin-bottom: 8px;
+    font-size: 11px;
+    margin-bottom: 6px;
   }
   
   .legend-item {
-    display: inline-flex;
-    align-items: center;
-    margin-right: 12px;
-    margin-bottom: 2px;
-    font-size: 10px;
+    font-size: 9px;
+    margin-bottom: 3px;
   }
   
   .legend-color {
-    width: 12px;
-    height: 8px;
+    width: 10px;
+    height: 6px;
     margin-right: 4px;
   }
+}
+
+/* Very small screens - compact mode */
+@media (max-width: 360px) {
+  .weather-panel {
+    min-width: 220px;
+    max-width: 240px;
+    padding: 10px;
+  }
   
-  /* Stack legend items horizontally on very small screens */
+  .weather-panel h2 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .weather-grid {
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  
+  .weather-item {
+    padding: 5px;
+  }
+  
+  .weather-item h3 {
+    font-size: 8px;
+  }
+  
+  .weather-value {
+    font-size: 11px;
+  }
+  
   .radar-legend {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
+    max-width: 140px;
+    padding: 6px;
   }
   
   .radar-legend h4 {
-    width: 100%;
+    font-size: 10px;
     margin-bottom: 4px;
+  }
+  
+  .legend-item {
+    font-size: 8px;
+    margin-bottom: 2px;
+  }
+  
+  .legend-color {
+    width: 8px;
+    height: 5px;
+    margin-right: 3px;
   }
 }
