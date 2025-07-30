@@ -19,13 +19,22 @@ let baseLayer = null;
 // Store center marker
 let centerMarker = null;
 
+function getInitialZoom() {
+  // Check if mobile (using same breakpoint as CSS)
+  const isMobile = window.innerWidth <= 480;
+  return isMobile ? 8 : 11; // 10-20% more zoomed out on mobile
+}
+
 function initializeMap() {
   console.log('Initializing Leaflet map...');
+  
+  const initialZoom = getInitialZoom();
+  console.log(`Setting initial zoom level: ${initialZoom} (mobile: ${window.innerWidth <= 480})`);
   
   // Initialize the map
   map = L.map('map', {
     center: MARKHAM_COORDS,
-    zoom: 11,
+    zoom: initialZoom,
     zoomControl: true,
     preferCanvas: true
   });
