@@ -22,7 +22,7 @@ let centerMarker = null;
 function getInitialZoom() {
   // Check if mobile (using same breakpoint as CSS)
   const isMobile = window.innerWidth <= 480;
-  return isMobile ? 8 : 11; // 10-20% more zoomed out on mobile
+  return isMobile ? 8.5 : 11; // Slightly more zoomed in on mobile to show Markham
 }
 
 function initializeMap() {
