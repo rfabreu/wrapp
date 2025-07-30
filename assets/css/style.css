@@ -69,14 +69,15 @@ html, body {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(10, 15, 20, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid #1a2332;
+  background: rgba(10, 15, 20, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 20px;
   min-width: 280px;
   z-index: 1000;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .weather-panel h2 {
@@ -105,15 +106,15 @@ html, body {
 /* Center marker ping animation - radar-style ping effect */
 @keyframes ping {
   0% {
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
     opacity: 0.8;
   }
   75% {
-    transform: scale(3);
+    transform: translate(-50%, -50%) scale(3);
     opacity: 0;
   }
   100% {
-    transform: scale(3);
+    transform: translate(-50%, -50%) scale(3);
     opacity: 0;
   }
 }
@@ -146,7 +147,8 @@ html, body {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center center;
   animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
   z-index: 1;
 }
@@ -245,13 +247,14 @@ html, body {
   position: absolute;
   bottom: 20px;
   left: 20px;
-  background: rgba(10, 15, 20, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid #1a2332;
+  background: rgba(10, 15, 20, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   padding: 16px;
   z-index: 1000;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
 .radar-legend h4 {
@@ -308,13 +311,142 @@ html, body {
   .weather-panel {
     right: 10px;
     top: 10px;
-    min-width: 250px;
+    left: 10px;
+    min-width: auto;
+    max-width: calc(100vw - 20px);
     padding: 16px;
+  }
+  
+  .weather-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  
+  .weather-item {
+    padding: 10px;
+  }
+  
+  .weather-value {
+    font-size: 14px;
   }
   
   .radar-legend {
     bottom: 10px;
     left: 10px;
+    right: 10px;
     padding: 12px;
+    max-width: calc(100vw - 20px);
+  }
+  
+  .legend-item {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  
+  .legend-color {
+    width: 14px;
+    height: 10px;
+    margin-right: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .weather-panel {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    min-width: auto;
+    padding: 14px;
+  }
+  
+  .weather-panel h2 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .weather-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  
+  .weather-item {
+    padding: 8px;
+  }
+  
+  .weather-item h3 {
+    font-size: 10px;
+    margin-bottom: 3px;
+  }
+  
+  .weather-value {
+    font-size: 13px;
+  }
+  
+  .forecast-section h3 {
+    font-size: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .forecast-day {
+    padding: 6px 0;
+  }
+  
+  .day-name {
+    font-size: 12px;
+    min-width: 50px;
+  }
+  
+  .day-temps {
+    font-size: 12px;
+  }
+  
+  .status-indicator {
+    font-size: 10px;
+    margin-top: 6px;
+  }
+  
+  .radar-legend {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .radar-legend h4 {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 12px;
+    margin-bottom: 2px;
+    font-size: 10px;
+  }
+  
+  .legend-color {
+    width: 12px;
+    height: 8px;
+    margin-right: 4px;
+  }
+  
+  /* Stack legend items horizontally on very small screens */
+  .radar-legend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .radar-legend h4 {
+    width: 100%;
+    margin-bottom: 4px;
   }
 }
