@@ -56,6 +56,7 @@ function initializeMap() {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       maxZoom: 19,
       subdomains: "abcd",
+      className: "basemap-layer",
     }
   );
   baseLayer.addTo(map);
@@ -329,6 +330,7 @@ async function loadRadar() {
       precipitationLayer = L.tileLayer(radarUrl, {
         opacity: 0.7,
         zIndex: 200,
+        className: "rainviewer-radar-layer",
       });
 
       if (map) {
@@ -372,6 +374,7 @@ function addWeatherLayers() {
       {
         opacity: 0.25,
         zIndex: 100,
+        className: "owm-clouds-layer",
       }
     );
     cloudsLayer.addTo(map);

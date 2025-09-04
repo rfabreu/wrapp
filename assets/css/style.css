@@ -346,19 +346,24 @@ body {
   border-color: rgba(255, 255, 255, 0.3);
 }
 .legend-light {
-  background: rgba(136, 255, 136, 0.7);
+  /* Light precipitation: green */
+  background: rgba(0, 168, 0, 0.75);
 }
 .legend-moderate {
-  background: rgba(255, 255, 0, 0.8);
+  /* Moderate precipitation: yellow */
+  background: rgba(255, 215, 0, 0.85);
 }
 .legend-heavy {
-  background: rgba(255, 165, 0, 0.9);
+  /* Heavy precipitation: orange */
+  background: rgba(255, 140, 0, 0.9);
 }
 .legend-intense {
+  /* Very heavy precipitation: red-orange */
   background: rgba(255, 69, 0, 0.95);
 }
 .legend-extreme {
-  background: rgba(255, 0, 0, 1);
+  /* Extreme precipitation / hail: magenta */
+  background: rgba(255, 0, 255, 1);
 }
 
 /* Timeline Controls - More transparent and minimalist */
