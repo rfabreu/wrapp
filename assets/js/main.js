@@ -432,6 +432,71 @@ function addWeatherLayers() {
   }
 }
 
+// Overlay controls wiring
+document.addEventListener("DOMContentLoaded", () => {
+  const controls = document.getElementById("overlay-controls");
+  if (!controls) return;
+
+  controls.addEventListener("click", (e) => {
+    const btn = e.target.closest(".overlay-btn");
+    if (!btn) return;
+    const type = btn.getAttribute("data-overlay");
+
+    // toggle active state
+    btn.classList.toggle("active");
+
+    if (type === "radar") {
+      if (btn.classList.contains("active")) {
+        if (precipitationLayer && map && !map.hasLayer(precipitationLayer)) {
+          precipitationLayer.addTo(map);
+        } else if (!precipitationLayer) {
+          // reload radar if needed
+          loadRadar();
+        }
+      } else {
+        if (precipitationLayer && map && map.hasLayer(precipitationLayer)) {
+          map.removeLayer(precipitationLayer);
+        }
+      }
+    }
+
+    if (type === "clouds") {
+      const legendItem = document.getElementById("overlay-item-clouds");
+      if (btn.classList.contains("active")) {
+        if (cloudsLayer && map && !map.hasLayer(cloudsLayer)) cloudsLayer.addTo(map);
+        if (legendItem) legendItem.style.display = "flex";
+      } else {
+        if (cloudsLayer && map && map.hasLayer(cloudsLayer)) map.removeLayer(cloudsLayer);
+        if (legendItem) legendItem.style.display = "none";
+      }
+    }
+
+    if (type === "owm-rain") {
+      const legendItem = document.getElementById("overlay-item-rain");
+      if (btn.classList.contains("active")) {
+        if (owmPrecipLight && map && !map.hasLayer(owmPrecipLight)) owmPrecipLight.addTo(map);
+        if (owmPrecipIntensity && map && !map.hasLayer(owmPrecipIntensity)) owmPrecipIntensity.addTo(map);
+        if (legendItem) legendItem.style.display = "flex";
+      } else {
+        if (owmPrecipLight && map && map.hasLayer(owmPrecipLight)) map.removeLayer(owmPrecipLight);
+        if (owmPrecipIntensity && map && map.hasLayer(owmPrecipIntensity)) map.removeLayer(owmPrecipIntensity);
+        if (legendItem) legendItem.style.display = "none";
+      }
+    }
+
+    if (type === "owm-snow") {
+      const legendItem = document.getElementById("overlay-item-snow");
+      if (btn.classList.contains("active")) {
+        if (snowLayer && map && !map.hasLayer(snowLayer)) snowLayer.addTo(map);
+        if (legendItem) legendItem.style.display = "flex";
+      } else {
+        if (snowLayer && map && map.hasLayer(snowLayer)) map.removeLayer(snowLayer);
+        if (legendItem) legendItem.style.display = "none";
+      }
+    }
+  });
+});
+
 // —— AUTO-REFRESH FUNCTIONS ——
 function refreshAllLayers() {
   console.log("Refreshing all layers...");

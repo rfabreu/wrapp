@@ -329,6 +329,28 @@ body {
   gap: 10px;
 }
 
+.overlay-controls {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.overlay-btn {
+  background: rgba(26, 35, 50, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: #e2e8f0;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.overlay-btn.active {
+  background: rgba(16, 185, 129, 0.8);
+  border-color: rgba(16, 185, 129, 0.6);
+  color: #ffffff;
+}
+
 .legend-color-info {
   display: flex;
   align-items: center;
