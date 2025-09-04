@@ -334,7 +334,7 @@ body {
 
 .legend-value {
   font-size: 11px;
-  color: #94a3b8;
+  color: #475569;
   font-weight: 500;
   min-width: 45px;
   text-align: right;
@@ -368,14 +368,14 @@ body {
 
 /* Apple-like visual tuning (non-destructive, purely cosmetic) */
 .leaflet-tile.basemap-layer {
-  filter: saturate(0.9) contrast(1.05) brightness(0.95);
+  filter: saturate(1.0) contrast(1.0) brightness(1.0);
 }
 
 .leaflet-tile.rainviewer-radar-layer {
-  /* Apple-like: softer, luminous precipitation look */
-  filter: saturate(1.15) contrast(1.03) brightness(1.03);
-  mix-blend-mode: screen;
-  opacity: 0.78;
+  /* Brighter look on light basemap */
+  filter: saturate(1.05) contrast(1.05);
+  mix-blend-mode: multiply;
+  opacity: 0.84;
 }
 
 .leaflet-tile.owm-clouds-layer {
@@ -384,8 +384,10 @@ body {
 
 /* Slight softening using backdrop blur behind legend for cohesion */
 .radar-legend {
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* Timeline Controls - More transparent and minimalist */
