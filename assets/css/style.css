@@ -470,43 +470,15 @@ body {
   letter-spacing: 0.5px;
 }
 
-.timeline-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px; /* Reduced gap */
-  margin-bottom: 8px; /* Reduced margin */
-}
+.timeline-controls { display: none; }
 
-.timeline-btn {
-  background: rgba(26, 35, 50, 0.4); /* More transparent */
-  border: 1px solid rgba(255, 255, 255, 0.08); /* More transparent border */
-  border-radius: 4px; /* More minimalist border radius */
-  padding: 6px 10px; /* Reduced padding */
-  color: #e2e8f0;
-  font-size: 11px; /* Smaller font */
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 3px; /* Reduced gap */
-}
+.timeline-btn { display: none; }
 
-.timeline-btn:hover {
-  background: rgba(26, 35, 50, 0.6);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-}
+.timeline-btn:hover { display: none; }
 
-.timeline-btn:active {
-  transform: scale(0.95);
-}
+.timeline-btn:active { display: none; }
 
-.timeline-btn.active {
-  background: rgba(16, 185, 129, 0.8); /* Slightly transparent active state */
-  border-color: rgba(16, 185, 129, 0.6);
-  color: #ffffff;
-}
+.timeline-btn.active { display: none; }
 
 .timeline-slider {
   width: 100%;
