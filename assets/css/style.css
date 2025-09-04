@@ -329,27 +329,7 @@ body {
   gap: 10px;
 }
 
-.overlay-controls {
-  display: flex;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.overlay-btn {
-  background: rgba(26, 35, 50, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  padding: 6px 8px;
-  color: #e2e8f0;
-  font-size: 11px;
-  cursor: pointer;
-}
-
-.overlay-btn.active {
-  background: rgba(16, 185, 129, 0.8);
-  border-color: rgba(16, 185, 129, 0.6);
-  color: #ffffff;
-}
+/* overlay controls removed per requirements */
 
 .legend-color-info {
   display: flex;
@@ -389,7 +369,7 @@ body {
 
 /* Apple-like visual tuning (non-destructive, purely cosmetic) */
 .leaflet-tile.basemap-layer {
-  filter: saturate(1.0) contrast(1.0) brightness(1.0);
+  filter: saturate(1.05) contrast(1.0) brightness(1.02) hue-rotate(0deg);
 }
 
 .leaflet-tile.rainviewer-radar-layer {
