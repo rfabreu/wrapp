@@ -318,6 +318,17 @@ body {
   color: #e2e8f0;
 }
 
+.legend-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 8px 0 10px;
+}
+
+.overlay-scale .legend-item {
+  justify-content: flex-start;
+  gap: 10px;
+}
+
 .legend-color-info {
   display: flex;
   align-items: center;
@@ -366,6 +377,11 @@ body {
   background: rgba(236, 72, 153, 1); /* pink-500 */
 }
 
+/* Overlay type swatches */
+.overlay-clouds { background: rgba(180, 186, 200, 0.9); }
+.overlay-rain { background: rgba(59, 130, 246, 0.9); }
+.overlay-snow { background: rgba(240, 248, 255, 0.95); border: 1px solid rgba(255,255,255,0.6); }
+
 /* Apple-like visual tuning (non-destructive, purely cosmetic) */
 .leaflet-tile.basemap-layer {
   filter: saturate(1.0) contrast(1.0) brightness(1.0);
@@ -388,6 +404,10 @@ body {
 
 .leaflet-tile.owm-precip-layer-intensity {
   mix-blend-mode: color-burn;
+}
+
+.leaflet-tile.owm-snow-layer {
+  mix-blend-mode: screen;
 }
 
 /* Slight softening using backdrop blur behind legend for cohesion */

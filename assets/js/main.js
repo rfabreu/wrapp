@@ -83,6 +83,7 @@ function initializeMap() {
 let precipitationLayer = null;
 let cloudsLayer = null;
 let windLayer = null;
+let snowLayer = null;
 
 // —— UTILITY FUNCTIONS ——
 function showLoader() {
@@ -387,7 +388,7 @@ function addWeatherLayers() {
     );
     cloudsLayer.addTo(map);
 
-    // Light precipitation overlay to soften hard edges
+    // Light precipitation overlay to soften hard edges (rain)
     const precipLight = L.tileLayer(
       `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
@@ -408,6 +409,17 @@ function addWeatherLayers() {
       }
     );
     precipIntensity.addTo(map);
+
+    // Snow overlay for explicit snow visualization
+    snowLayer = L.tileLayer(
+      `https://tile.openweathermap.org/map/snow/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
+      {
+        opacity: 0.4,
+        zIndex: 196,
+        className: "owm-snow-layer",
+      }
+    );
+    snowLayer.addTo(map);
 
     console.log("Weather layers added successfully");
   } catch (error) {
