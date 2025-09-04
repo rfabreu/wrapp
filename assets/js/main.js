@@ -9,6 +9,8 @@ if (!OWM_API_KEY) {
 // Updated coordinates for the new center location
 const MARKHAM_COORDS = [43.828491, -79.332114];
 const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+// RainViewer color scheme (classic green→yellow→orange→red→magenta)
+const RAINVIEWER_COLOR_SCHEME = 3;
 
 console.log("Weather Radar App - main.js loaded");
 console.log("API Key present:", !!OWM_API_KEY);
@@ -326,7 +328,7 @@ async function loadRadar() {
 
     if (radarTimestamp) {
       // Use 512px tiles for smoother rendering
-      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${radarTimestamp}/512/{z}/{x}/{y}/2/1_1.png`;
+      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${radarTimestamp}/512/{z}/{x}/{y}/${RAINVIEWER_COLOR_SCHEME}/1_1.png`;
 
       // Remove existing precipitation layer
       if (precipitationLayer && map) {
