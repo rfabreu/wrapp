@@ -58,8 +58,8 @@
 
     <!-- Enhanced Radar Legend -->
     <div class="radar-legend">
-      <h4>Precipitation (Reflectivity dBZ)</h4>
-      <div class="legend-scale">
+      <h4 id="legend-title">Precipitation (Reflectivity dBZ)</h4>
+      <div class="legend-scale" id="legend-scale">
         <div class="legend-item">
           <div class="legend-color-info">
             <div class="legend-color legend-clear"></div>
@@ -112,18 +112,13 @@
             <span>Clouds</span>
           </div>
         </div>
-        <div class="legend-item">
-          <div class="legend-color-info">
-            <div class="legend-color overlay-rain"></div>
-            <span>Rain</span>
-          </div>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color-info">
-            <div class="legend-color overlay-snow"></div>
-            <span>Snow</span>
-          </div>
-        </div>
+      </div>
+
+      <div class="overlay-controls" id="overlay-controls">
+        <button class="overlay-btn active" data-overlay="radar">Radar</button>
+        <button class="overlay-btn" data-overlay="owm-rain">Rain</button>
+        <button class="overlay-btn" data-overlay="owm-snow">Snow</button>
+        <button class="overlay-btn" data-overlay="clouds">Clouds</button>
       </div>
     </div>
 

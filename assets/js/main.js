@@ -84,6 +84,8 @@ let precipitationLayer = null;
 let cloudsLayer = null;
 let windLayer = null;
 let snowLayer = null;
+let owmPrecipLight = null;
+let owmPrecipIntensity = null;
 
 // —— UTILITY FUNCTIONS ——
 function showLoader() {
@@ -389,7 +391,7 @@ function addWeatherLayers() {
     cloudsLayer.addTo(map);
 
     // Light precipitation overlay to soften hard edges (rain)
-    const precipLight = L.tileLayer(
+    owmPrecipLight = L.tileLayer(
       `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
         opacity: 0.25,
@@ -397,10 +399,11 @@ function addWeatherLayers() {
         className: "owm-precip-layer-light",
       }
     );
-    precipLight.addTo(map);
+    // Disabled by default to avoid legend mismatch
+    // owmPrecipLight.addTo(map);
 
     // Additional intensity overlay for depth
-    const precipIntensity = L.tileLayer(
+    owmPrecipIntensity = L.tileLayer(
       `https://tile.openweathermap.org/map/precipitation/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
         opacity: 0.15,
@@ -408,7 +411,8 @@ function addWeatherLayers() {
         className: "owm-precip-layer-intensity",
       }
     );
-    precipIntensity.addTo(map);
+    // Disabled by default to avoid legend mismatch
+    // owmPrecipIntensity.addTo(map);
 
     // Snow overlay for explicit snow visualization
     snowLayer = L.tileLayer(
@@ -419,7 +423,8 @@ function addWeatherLayers() {
         className: "owm-snow-layer",
       }
     );
-    snowLayer.addTo(map);
+    // Disabled by default to avoid legend mismatch
+    // snowLayer.addTo(map);
 
     console.log("Weather layers added successfully");
   } catch (error) {

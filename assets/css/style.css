@@ -351,36 +351,19 @@ body {
   text-align: right;
 }
 
-/* Updated legend colors to match radar intensity */
+/* Updated legend colors to match RainViewer radar reflectivity */
 .legend-clear {
   background: transparent;
   border-color: rgba(255, 255, 255, 0.3);
 }
-.legend-light {
-  /* Apple-like gradient start: blue */
-  background: rgba(59, 130, 246, 0.8); /* blue-500 */
-}
-.legend-moderate {
-  /* Indigo */
-  background: rgba(99, 102, 241, 0.85); /* indigo-500 */
-}
-.legend-heavy {
-  /* Violet */
-  background: rgba(139, 92, 246, 0.9); /* violet-500 */
-}
-.legend-intense {
-  /* Fuchsia */
-  background: rgba(217, 70, 239, 0.95); /* fuchsia-500 */
-}
-.legend-extreme {
-  /* Pink (toward magenta) */
-  background: rgba(236, 72, 153, 1); /* pink-500 */
-}
+.legend-light { background: rgba(0, 168, 0, 0.75); }      /* green */
+.legend-moderate { background: rgba(255, 215, 0, 0.85); }  /* yellow */
+.legend-heavy { background: rgba(255, 140, 0, 0.9); }      /* orange */
+.legend-intense { background: rgba(255, 69, 0, 0.95); }    /* red-orange */
+.legend-extreme { background: rgba(255, 0, 255, 1); }      /* magenta */
 
 /* Overlay type swatches */
 .overlay-clouds { background: rgba(180, 186, 200, 0.9); }
-.overlay-rain { background: rgba(59, 130, 246, 0.9); }
-.overlay-snow { background: rgba(240, 248, 255, 0.95); border: 1px solid rgba(255,255,255,0.6); }
 
 /* Apple-like visual tuning (non-destructive, purely cosmetic) */
 .leaflet-tile.basemap-layer {
