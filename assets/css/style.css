@@ -307,7 +307,15 @@ body {
 .legend-gradient-bar { width: 160px; height: 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);
   background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,168,0,1) 15%, rgba(255,215,0,1) 40%, rgba(255,140,0,1) 60%, rgba(255,69,0,1) 80%, rgba(255,0,255,1) 100%);
 }
-.legend-gradient-bar.vertical { width: 8px; height: 120px; background: linear-gradient(180deg, rgba(255,0,255,1) 0%, rgba(255,69,0,1) 20%, rgba(255,140,0,1) 40%, rgba(255,215,0,1) 60%, rgba(0,168,0,1) 85%, rgba(0,0,0,0) 100%); }
+.legend-gradient-bar.vertical { width: 8px; height: 200px; background: linear-gradient(180deg,
+  rgba(255,0,255,1) 0%,          /* magenta */
+  rgba(255,69,0,1) 18%,          /* red-orange */
+  rgba(255,140,0,1) 36%,         /* orange */
+  rgba(255,215,0,1) 55%,         /* yellow */
+  rgba(0,168,0,1) 75%,           /* green */
+  rgba(56,189,248,1) 88%,        /* light blue */
+  rgba(37,99,235,1) 100%         /* blue */
+); }
 .legend-ticklist { display: flex; flex-direction: column; gap: 4px; justify-content: space-between; }
 .legend-tick { display: flex; justify-content: space-between; gap: 12px; font-size: 11px; color: #e2e8f0; }
 .legend-tick .tick-label { color: #e2e8f0; }

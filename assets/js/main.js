@@ -9,8 +9,8 @@ if (!OWM_API_KEY) {
 // Updated coordinates for the new center location
 const MARKHAM_COORDS = [43.828491, -79.332114];
 const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
-// RainViewer color scheme (classic green→yellow→orange→red→magenta)
-const RAINVIEWER_COLOR_SCHEME = 3;
+// RainViewer color scheme: Universal Blue (includes blues at low intensities)
+const RAINVIEWER_COLOR_SCHEME = 2;
 
 console.log("Weather Radar App - main.js loaded");
 console.log("API Key present:", !!OWM_API_KEY);
