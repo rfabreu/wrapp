@@ -321,6 +321,15 @@ body {
 .legend-tick .tick-label { color: #e2e8f0; }
 .legend-tick .tick-value { color: #94a3b8; }
 
+.ptype-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.ptype-label { font-size: 11px; color: #e2e8f0; }
+.ptype-badge { font-size: 11px; padding: 2px 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); }
+.ptype-rain { background: rgba(59,130,246,0.2); color: #93c5fd; border-color: rgba(147,197,253,0.5); }
+.ptype-snow { background: rgba(226,232,240,0.2); color: #e2e8f0; border-color: rgba(226,232,240,0.5); }
+.ptype-freezing { background: rgba(217,70,239,0.2); color: #f0abfc; border-color: rgba(240,171,252,0.5); }
+.ptype-mix { background: rgba(234,179,8,0.2); color: #fde68a; border-color: rgba(253,230,138,0.5); }
+.ptype-none { background: rgba(30,41,59,0.2); color: #94a3b8; }
+
 .legend-scale {
   display: flex;
   flex-direction: column;

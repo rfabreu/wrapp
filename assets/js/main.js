@@ -203,6 +203,24 @@ function updateCurrentWeather(data) {
     )} km/h`;
 
     // Update wind direction
+    // Update precipitation type badge using OWM weather codes
+    const badge = document.getElementById("ptype-badge");
+    if (badge && data.weather && data.weather.length > 0) {
+      const code = data.weather[0].id;
+      let cls = "ptype-none";
+      let label = "—";
+      if (code >= 200 && code < 300) { cls = "ptype-freezing"; label = "Thunderstorm"; }
+      else if (code === 511) { cls = "ptype-freezing"; label = "Freezing Rain"; }
+      else if (code >= 600 && code < 700) { cls = "ptype-snow"; label = "Snow"; }
+      else if (code >= 611 && code <= 616) { cls = "ptype-mix"; label = "Sleet"; }
+      else if (code >= 300 && code < 400) { cls = "ptype-rain"; label = "Drizzle"; }
+      else if (code >= 500 && code < 600) { cls = "ptype-rain"; label = "Rain"; }
+      else if (code >= 700 && code < 800) { cls = "ptype-none"; label = "Atmosphere"; }
+      else if (code === 800) { cls = "ptype-none"; label = "Clear"; }
+      else if (code > 800 && code < 900) { cls = "ptype-none"; label = "Clouds"; }
+      badge.className = `ptype-badge ${cls}`;
+      badge.textContent = label;
+    }
     if (data.wind && data.wind.deg !== undefined) {
       const compassDirection = degreesToCompass(data.wind.deg);
       document.getElementById(
