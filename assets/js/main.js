@@ -48,15 +48,18 @@ function initializeMap() {
   // Add zoom control
   map.zoomControl.setPosition("topleft");
 
-  // Simple terrain base map - clean satellite view without excessive detail
+  // Apple-like dark basemap
   baseLayer = L.tileLayer(
-    "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
     {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      maxZoom: 19,
+      maxZoom: 20,
       subdomains: "abcd",
       className: "basemap-layer",
+      keepBuffer: 8,
+      updateWhenZooming: false,
+      updateWhenIdle: true,
     }
   );
   baseLayer.addTo(map);
@@ -319,7 +322,8 @@ async function loadRadar() {
     }
 
     if (radarTimestamp) {
-      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${radarTimestamp}/256/{z}/{x}/{y}/2/1_1.png`;
+      // Use 512px tiles for smoother rendering
+      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${radarTimestamp}/512/{z}/{x}/{y}/2/1_1.png`;
 
       // Remove existing precipitation layer
       if (precipitationLayer && map) {
@@ -328,9 +332,13 @@ async function loadRadar() {
 
       // Add new precipitation layer
       precipitationLayer = L.tileLayer(radarUrl, {
-        opacity: 0.7,
+        opacity: 0.72,
         zIndex: 200,
         className: "rainviewer-radar-layer",
+        updateWhenIdle: true,
+        updateWhenZooming: false,
+        keepBuffer: 6,
+        detectRetina: true,
       });
 
       if (map) {
