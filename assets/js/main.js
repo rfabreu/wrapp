@@ -380,12 +380,34 @@ function addWeatherLayers() {
     cloudsLayer = L.tileLayer(
       `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
-        opacity: 0.25,
+        opacity: 0.22,
         zIndex: 100,
         className: "owm-clouds-layer",
       }
     );
     cloudsLayer.addTo(map);
+
+    // Light precipitation overlay to soften hard edges
+    const precipLight = L.tileLayer(
+      `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
+      {
+        opacity: 0.25,
+        zIndex: 190,
+        className: "owm-precip-layer-light",
+      }
+    );
+    precipLight.addTo(map);
+
+    // Additional intensity overlay for depth
+    const precipIntensity = L.tileLayer(
+      `https://tile.openweathermap.org/map/precipitation/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
+      {
+        opacity: 0.15,
+        zIndex: 195,
+        className: "owm-precip-layer-intensity",
+      }
+    );
+    precipIntensity.addTo(map);
 
     console.log("Weather layers added successfully");
   } catch (error) {
