@@ -9,6 +9,8 @@ if (!OWM_API_KEY) {
 // Updated coordinates for the new center location
 const MARKHAM_COORDS = [43.828491, -79.332114];
 const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+// RainViewer color scheme: Universal Blue (includes blues at low intensities)
+const RAINVIEWER_COLOR_SCHEME = 2;
 
 console.log("Weather Radar App - main.js loaded");
 console.log("API Key present:", !!OWM_API_KEY);
@@ -48,14 +50,18 @@ function initializeMap() {
   // Add zoom control
   map.zoomControl.setPosition("topleft");
 
-  // Simple terrain base map - clean satellite view without excessive detail
+  // Apple-like light basemap with bluer water (CARTO Voyager)
   baseLayer = L.tileLayer(
     "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
     {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      maxZoom: 19,
+      maxZoom: 20,
       subdomains: "abcd",
+      className: "basemap-layer",
+      keepBuffer: 8,
+      updateWhenZooming: false,
+      updateWhenIdle: true,
     }
   );
   baseLayer.addTo(map);
@@ -79,6 +85,9 @@ function initializeMap() {
 let precipitationLayer = null;
 let cloudsLayer = null;
 let windLayer = null;
+let snowLayer = null;
+let owmPrecipLight = null;
+let owmPrecipIntensity = null;
 
 // —— UTILITY FUNCTIONS ——
 function showLoader() {
@@ -194,6 +203,24 @@ function updateCurrentWeather(data) {
     )} km/h`;
 
     // Update wind direction
+    // Update precipitation type badge using OWM weather codes
+    const badge = document.getElementById("ptype-badge");
+    if (badge && data.weather && data.weather.length > 0) {
+      const code = data.weather[0].id;
+      let cls = "ptype-none";
+      let label = "—";
+      if (code >= 200 && code < 300) { cls = "ptype-freezing"; label = "Thunderstorm"; }
+      else if (code === 511) { cls = "ptype-freezing"; label = "Freezing Rain"; }
+      else if (code >= 600 && code < 700) { cls = "ptype-snow"; label = "Snow"; }
+      else if (code >= 611 && code <= 616) { cls = "ptype-mix"; label = "Sleet"; }
+      else if (code >= 300 && code < 400) { cls = "ptype-rain"; label = "Drizzle"; }
+      else if (code >= 500 && code < 600) { cls = "ptype-rain"; label = "Rain"; }
+      else if (code >= 700 && code < 800) { cls = "ptype-none"; label = "Atmosphere"; }
+      else if (code === 800) { cls = "ptype-none"; label = "Clear"; }
+      else if (code > 800 && code < 900) { cls = "ptype-none"; label = "Clouds"; }
+      badge.className = `ptype-badge ${cls}`;
+      badge.textContent = label;
+    }
     if (data.wind && data.wind.deg !== undefined) {
       const compassDirection = degreesToCompass(data.wind.deg);
       document.getElementById(
@@ -318,7 +345,8 @@ async function loadRadar() {
     }
 
     if (radarTimestamp) {
-      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${radarTimestamp}/256/{z}/{x}/{y}/2/1_1.png`;
+      // Use 512px tiles for smoother rendering
+      const radarUrl = `https://tilecache.rainviewer.com/v2/radar/${radarTimestamp}/512/{z}/{x}/{y}/${RAINVIEWER_COLOR_SCHEME}/1_1.png`;
 
       // Remove existing precipitation layer
       if (precipitationLayer && map) {
@@ -327,8 +355,13 @@ async function loadRadar() {
 
       // Add new precipitation layer
       precipitationLayer = L.tileLayer(radarUrl, {
-        opacity: 0.7,
+        opacity: 0.72,
         zIndex: 200,
+        className: "rainviewer-radar-layer",
+        updateWhenIdle: true,
+        updateWhenZooming: false,
+        keepBuffer: 6,
+        detectRetina: true,
       });
 
       if (map) {
@@ -370,17 +403,56 @@ function addWeatherLayers() {
     cloudsLayer = L.tileLayer(
       `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
       {
-        opacity: 0.25,
+        opacity: 0.22,
         zIndex: 100,
+        className: "owm-clouds-layer",
       }
     );
     cloudsLayer.addTo(map);
+
+    // Light precipitation overlay to soften hard edges (rain)
+    owmPrecipLight = L.tileLayer(
+      `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
+      {
+        opacity: 0.25,
+        zIndex: 190,
+        className: "owm-precip-layer-light",
+      }
+    );
+    // Disabled by default to avoid legend mismatch
+    // owmPrecipLight.addTo(map);
+
+    // Additional intensity overlay for depth
+    owmPrecipIntensity = L.tileLayer(
+      `https://tile.openweathermap.org/map/precipitation/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
+      {
+        opacity: 0.15,
+        zIndex: 195,
+        className: "owm-precip-layer-intensity",
+      }
+    );
+    // Disabled by default to avoid legend mismatch
+    // owmPrecipIntensity.addTo(map);
+
+    // Snow overlay for explicit snow visualization
+    snowLayer = L.tileLayer(
+      `https://tile.openweathermap.org/map/snow/{z}/{x}/{y}.png?appid=${OWM_API_KEY}`,
+      {
+        opacity: 0.4,
+        zIndex: 196,
+        className: "owm-snow-layer",
+      }
+    );
+    // Disabled by default to avoid legend mismatch
+    // snowLayer.addTo(map);
 
     console.log("Weather layers added successfully");
   } catch (error) {
     console.error("Error adding weather layers:", error);
   }
 }
+
+// overlay controls removed per requirements
 
 // —— AUTO-REFRESH FUNCTIONS ——
 function refreshAllLayers() {

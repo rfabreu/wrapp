@@ -5,11 +5,12 @@ let timelineAnimationId = null;
 
 // Time formatting functions
 function formatTime(date) {
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
+  // 24-hour format HH:MM:SS
+  return date.toLocaleTimeString("en-CA", {
+    hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: true,
+    hour12: false,
   });
 }
 
@@ -37,15 +38,7 @@ function updateCurrentTime() {
   }
 
   if (statusElement) {
-    if (isLiveMode) {
-      statusElement.textContent = "Live • Current Local Time";
-    } else if (currentTimeOffset < 0) {
-      statusElement.textContent = `${Math.abs(currentTimeOffset)} min ago`;
-    } else if (currentTimeOffset > 0) {
-      statusElement.textContent = `${currentTimeOffset} min forecast`;
-    } else {
-      statusElement.textContent = "Current Time";
-    }
+    statusElement.textContent = "Current Time";
   }
 }
 
@@ -60,55 +53,11 @@ function updateTimelineHandle() {
 }
 
 // Timeline control functions
-function replayRadar() {
-  console.log("Replay radar clicked");
-  isLiveMode = false;
-  currentTimeOffset = -30;
+function replayRadar() {}
 
-  // Update UI
-  updateTimelineButtons();
-  updateCurrentTime();
-  updateTimelineHandle();
+function goLive() {}
 
-  // Start animation from -30 to current time
-  animateReplay();
-}
-
-function goLive() {
-  console.log("Go live clicked");
-  isLiveMode = true;
-  currentTimeOffset = 0;
-
-  // Stop any animation
-  if (timelineAnimationId) {
-    cancelAnimationFrame(timelineAnimationId);
-    timelineAnimationId = null;
-  }
-
-  // Update UI
-  updateTimelineButtons();
-  updateCurrentTime();
-  updateTimelineHandle();
-
-  // Refresh radar data
-  if (window.loadRadar) {
-    window.loadRadar();
-  }
-}
-
-function showForecast() {
-  console.log("Show forecast clicked");
-  isLiveMode = false;
-  currentTimeOffset = 30;
-
-  // Update UI
-  updateTimelineButtons();
-  updateCurrentTime();
-  updateTimelineHandle();
-
-  // Load forecast radar data (placeholder - would need forecast API)
-  console.log("Loading forecast radar data...");
-}
+function showForecast() {}
 
 // Animate replay from -30 minutes to current time
 function animateReplay() {
@@ -143,52 +92,10 @@ function animateReplay() {
 }
 
 // Update button states
-function updateTimelineButtons() {
-  const buttons = document.querySelectorAll(".timeline-btn");
-  buttons.forEach((btn) => btn.classList.remove("active"));
-
-  const liveBtn = document.getElementById("live-btn");
-  const replayBtn = document.getElementById("replay-btn");
-  const forecastBtn = document.getElementById("forecast-btn");
-
-  if (isLiveMode && liveBtn) {
-    liveBtn.classList.add("active");
-  } else if (currentTimeOffset <= -25 && replayBtn) {
-    replayBtn.classList.add("active");
-  } else if (currentTimeOffset >= 25 && forecastBtn) {
-    forecastBtn.classList.add("active");
-  }
-}
+function updateTimelineButtons() {}
 
 // Handle timeline slider clicks
-function handleTimelineClick(event) {
-  const slider = document.getElementById("timeline-slider");
-  if (!slider) return;
-
-  const rect = slider.getBoundingClientRect();
-  const clickX = event.clientX - rect.left;
-  const percentage = (clickX / rect.width) * 100;
-
-  // Convert percentage to time offset (-30 to +30 minutes)
-  currentTimeOffset = Math.round((percentage / 100) * 60 - 30);
-  currentTimeOffset = Math.max(-30, Math.min(30, currentTimeOffset)); // Clamp to bounds
-
-  // Update mode
-  isLiveMode = currentTimeOffset === 0;
-
-  // Stop any animation
-  if (timelineAnimationId) {
-    cancelAnimationFrame(timelineAnimationId);
-    timelineAnimationId = null;
-  }
-
-  // Update UI
-  updateTimelineButtons();
-  updateCurrentTime();
-  updateTimelineHandle();
-
-  console.log(`Timeline clicked: ${currentTimeOffset} minutes offset`);
-}
+function handleTimelineClick(event) {}
 
 // Dragging functionality for timeline handle
 let isDragging = false;
@@ -255,9 +162,7 @@ function initializeTimeline() {
 
   // Update time display every second
   setInterval(() => {
-    if (isLiveMode) {
-      updateCurrentTime();
-    }
+    updateCurrentTime();
   }, 1000);
 }
 
