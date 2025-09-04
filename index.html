@@ -58,51 +58,23 @@
 
     <!-- Enhanced Radar Legend -->
     <div class="radar-legend">
-      <h4>Precipitation Intensity</h4>
-      <div class="legend-scale">
-        <div class="legend-item">
-          <div class="legend-color-info">
-            <div class="legend-color legend-clear"></div>
-            <span>Clear</span>
-          </div>
-          <span class="legend-value">0 mm/h</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color-info">
-            <div class="legend-color legend-light"></div>
-            <span>Light</span>
-          </div>
-          <span class="legend-value">0.1-2.5</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color-info">
-            <div class="legend-color legend-moderate"></div>
-            <span>Moderate</span>
-          </div>
-          <span class="legend-value">2.5-10</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color-info">
-            <div class="legend-color legend-heavy"></div>
-            <span>Heavy</span>
-          </div>
-          <span class="legend-value">10-50</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color-info">
-            <div class="legend-color legend-intense"></div>
-            <span>Intense</span>
-          </div>
-          <span class="legend-value">50-100</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color-info">
-            <div class="legend-color legend-extreme"></div>
-            <span>Extreme</span>
-          </div>
-          <span class="legend-value">100+ mm/h</span>
+      <h4 id="legend-title">Precipitation (Reflectivity dBZ)</h4>
+      <div class="legend-vertical">
+        <div class="legend-gradient-bar vertical"></div>
+        <div class="legend-ticklist">
+          <div class="legend-tick"><span class="tick-label">Extreme Storms</span><span class="tick-value">55+ dBZ</span></div>
+          <div class="legend-tick"><span class="tick-label">Intense Storm</span><span class="tick-value">45–55 dBZ</span></div>
+          <div class="legend-tick"><span class="tick-label">Heavy Rain</span><span class="tick-value">35–45 dBZ</span></div>
+          <div class="legend-tick"><span class="tick-label">Moderate Rain</span><span class="tick-value">20–35 dBZ</span></div>
+          <div class="legend-tick"><span class="tick-label">Light Rain</span><span class="tick-value">5–20 dBZ</span></div>
+          <div class="legend-tick"><span class="tick-label">Very Light / Drizzle</span><span class="tick-value">0–5 dBZ</span></div>
         </div>
       </div>
+      <div class="ptype-row">
+        <span class="ptype-label">Precipitation Type</span>
+        <span id="ptype-badge" class="ptype-badge ptype-none">—</span>
+      </div>
+
     </div>
 
     <!-- Timeline Controls -->
@@ -114,22 +86,11 @@
         </div>
       </div>
 
-      <div class="timeline-controls">
-        <button class="timeline-btn" id="replay-btn" onclick="replayRadar()">
-          <span>⪪</span> Replay
-        </button>
-        <button class="timeline-btn active" id="live-btn" onclick="goLive()">
-          <span>🔴</span> Live
-        </button>
-        <button class="timeline-btn" id="forecast-btn" onclick="showForecast()">
-          <span>⩥</span> +1hr
-        </button>
-      </div>
+      
 
       <div
         class="timeline-slider"
         id="timeline-slider"
-        onclick="handleTimelineClick(event)"
       >
         <div class="timeline-track">
           <div
