@@ -303,33 +303,15 @@ body {
   text-align: center;
 }
 
-.legend-gradient {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 10px;
+.legend-vertical { display: flex; flex-direction: row; gap: 10px; align-items: stretch; }
+.legend-gradient-bar { width: 160px; height: 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);
+  background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,168,0,1) 15%, rgba(255,215,0,1) 40%, rgba(255,140,0,1) 60%, rgba(255,69,0,1) 80%, rgba(255,0,255,1) 100%);
 }
-
-.legend-gradient-bar {
-  height: 8px;
-  border-radius: 4px;
-  background: linear-gradient(90deg,
-    rgba(0,0,0,0) 0%,
-    rgba(0,168,0,1) 15%,
-    rgba(255,215,0,1) 40%,
-    rgba(255,140,0,1) 60%,
-    rgba(255,69,0,1) 80%,
-    rgba(255,0,255,1) 100%
-  );
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
-.legend-ticks {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10px;
-  color: #94a3b8;
-}
+.legend-gradient-bar.vertical { width: 8px; height: 120px; background: linear-gradient(180deg, rgba(255,0,255,1) 0%, rgba(255,69,0,1) 20%, rgba(255,140,0,1) 40%, rgba(255,215,0,1) 60%, rgba(0,168,0,1) 85%, rgba(0,0,0,0) 100%); }
+.legend-ticklist { display: flex; flex-direction: column; gap: 4px; justify-content: space-between; }
+.legend-tick { display: flex; justify-content: space-between; gap: 12px; font-size: 11px; color: #e2e8f0; }
+.legend-tick .tick-label { color: #e2e8f0; }
+.legend-tick .tick-value { color: #94a3b8; }
 
 .legend-scale {
   display: flex;
